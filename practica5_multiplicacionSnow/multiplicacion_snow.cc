@@ -29,7 +29,7 @@ std::bitset<8> Producto(std::bitset<8> num, std::bitset<8> num2, std::bitset<8> 
   int controlador_ultimobit;
   // Descomponer el número en la suma de sus componentes
   for (int i = 0; i < 8; i++) {
-    //std::cout << "que contiene num2[i]: indice " << i << "\t numero es: "  << num2[i] << std::endl;
+    // std::cout << "que contiene num2[i]: indice " << i << "\t numero es: "  << num2[i] << std::endl;
     if (num2[i] == 1) {
       auxsuma = num;
       std::cout <<"\t" << auxsuma << std::endl;

@@ -9,6 +9,9 @@
 #define AES_H_
 
 
+/**
+ * @brief Clase que implementa el algoritmo de cifrado AES.
+ */
 class AES {
  public:
   enum KeyLength { AES_128 = 16, AES_192 = 24, AES_256 = 32 };
@@ -26,6 +29,15 @@ class AES {
   void Encrypt(const uint8_t* input, int length, uint8_t* output);
 
 
+    /**
+     * @brief Dado un conjunto de caracteres este método calcula su cifrado.
+     * @param[in] plaintext Buffer a encriptar.
+     * @param[in] length Tamaño del buffer.
+     * @param[in] iv Vector de inicialización.
+     * @param[out] ciphertext Buffer donde guardar el input encriptado.
+     */
+  void EncryptCBC( const uint8_t* plaintext, size_t length, const uint8_t* iv, uint8_t* ciphertext);
+
 
   /**
    * @brief Dado un bloque de 128 bits calcula su encriptación.
@@ -33,7 +45,6 @@ class AES {
    * @param[out] output Buffer donde guardar el resultado.
    */
   void EncryptBlock(const uint8_t input[16], uint8_t output[16]);
-
 
   static size_t EncryptedLength(int length);
 
@@ -79,8 +90,7 @@ class AES {
       0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f,
       0xb0, 0x54, 0xbb, 0x16};
 
- 
-
+  
   /**
    * @brief Dada una clave inicial de tamaño (128, 192, 256) se generarán tantas
    *        claves como sean necesarias para poder utilizarlas en cada una de
@@ -94,8 +104,7 @@ class AES {
    */
   void ShiftRows();
 
-
-
+  
   /**
    * @brief Rota los elementos de un array dado un desplazamiento.
    * @param[out] row Array que se rotará.
@@ -124,7 +133,7 @@ class AES {
    * @param[out] column Columna que se multiplicará.
    */
   void MixColumn(uint8_t* column) const;
- 
+
 
   /**
    * @brief Hace un xor ente la clave correspondiente a la ronda actual y el
@@ -154,6 +163,8 @@ class AES {
    * @return Caracter sustituido.
    */
   inline uint8_t GetSubByte(uint8_t index) const;
+
+
 
   /**
    * @brief Duplicación dentro de GF(2^8).
