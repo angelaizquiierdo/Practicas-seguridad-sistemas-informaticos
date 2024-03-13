@@ -75,7 +75,16 @@ void AES::UpdatePrevCiphertext(const uint8_t* new_ciphertext) {
   memcpy(prev_ciphertext_.data(), new_ciphertext, key_length_);
 }
 
+
+
 void AES::EncryptCBC(const uint8_t* plaintext, const uint8_t* iv, uint8_t* ciphertext) {
+  
+  if(length_plaintext_ % 16 != 0){
+    std::vector<uint8_t> plaintext_buffer(key_length_); // Nuevo búfer para el texto en claro
+    memccpy(plaintext_buffer.data(), plaintext, key_length_, length_plaintext_); // Copia los datos de plaintext a plaintext_buffer
+
+  }
+
   size_t pos = 0;
   UpdatePrevCiphertext(iv);
   
@@ -83,7 +92,6 @@ void AES::EncryptCBC(const uint8_t* plaintext, const uint8_t* iv, uint8_t* ciphe
   while (pos + 16 <= length_plaintext_) {
     EncryptCBCBlock(plaintext + pos, ciphertext + pos);
     pos += 16;
-    std::cout << "\t Posicion " << pos << std::endl;
   }
 }
 
@@ -91,17 +99,27 @@ void AES::EncryptCBC(const uint8_t* plaintext, const uint8_t* iv, uint8_t* ciphe
 
 void AES::EncryptCBCBlock(const uint8_t* plaintext,uint8_t* ciphertext) {
 
+
+  
   std::vector<uint8_t> plaintext_buffer(key_length_); // Nuevo búfer para el texto en claro
   memcpy(plaintext_buffer.data(), plaintext, key_length_); // Copia los datos de plaintext a plaintext_buffer
 
-  
+  std::cout << "plaintext_buffer: ";
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)plaintext_buffer[k];
+  }
+  std::cout << "\n";
+
+  std::cout << "prev_ciphertext_: ";
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)prev_ciphertext_[k];
+  }
+  std::cout << "\n";
 
   // Combina el bloque de texto en claro con el bloque previamente cifrado
   for (size_t j = 0; j < key_length_; ++j) {
     plaintext_buffer[j] ^= prev_ciphertext_[j];
   }
-
-  
 
   // Cifra el bloque modificado
   EncryptBlock(plaintext_buffer.data(), ciphertext);
@@ -117,9 +135,10 @@ void AES::EncryptCBCBlock(const uint8_t* plaintext,uint8_t* ciphertext) {
 void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
   // copia de memoria el input al estado
   memcpy(state_.data(), input, 16);
+
   // Ronda inicio
   AddRoundKey(0);
-  
+  rounds_ = 10;
     // 9 rondas
   for (int i = 1; i < rounds_; i++) {
     for (int j = 0; j < 16; j++) {
@@ -129,8 +148,7 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
     ShiftRows();
     MixColumns();
     AddRoundKey(i);
-    
-    std::cout << "R" << i << "(subclave = ";
+  
   }
 
   for (int j = 0; j < 16; j++) {
@@ -139,15 +157,7 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
 
   ShiftRows();
   AddRoundKey(rounds_);
-  std::cout << "R10 (subclave = ";
-  for(int k = 0; k < 16; k++){
-    std::cout << std::hex << (int)expanded_key_[9*16 + k];
-  }
-  std::cout << ") = ";
-  for(int k = 0; k < 16; k++){
-    std::cout << std::hex << (int)state_[k];
-  }
-  std::cout << "\n";
+
   memcpy(salida, state_.data(), 16);
 }
 

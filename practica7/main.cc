@@ -11,6 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <iomanip> // Para std::setw y std::setfill
 
 
 #include "aes.h"
@@ -103,16 +104,16 @@ int main() {
   uint8_t salida[bloque2_vector.size()];
   aes.EncryptCBC(bloque2, IV,salida);
   
-    //int tamayo = sizeof(texto);
-    // Realizar el cifrado
-    //aes.Encrypt(texto, tamayo , encriptar_aes);
-
-    // Mostrar el resultado del cifrado
-  
-  for (size_t i = 0; i < sizeof(salida); ++i) {
-    std::cout << std::hex << (int)salida[i];
+  std::cout << "\n\nTexto encriptado con modo CBC:" << std::endl;
+  size_t tamayo_del_arreglo = sizeof(salida)/sizeof(salida[0]);
+  for (size_t i = 0; i < tamayo_del_arreglo; i += 16) {
+    std::cout << "Bloque " << (i / 16) + 1 << ": ";
+    for (size_t j = 0; j < 16 && i + j < tamayo_del_arreglo; ++j) {
+        //std::cout << i + j << "  -  ";
+        std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(salida[i + j]) << " ";
+    }
+    std::cout << std::endl;
   }
-  std::cout << std::endl;
 
 
 
