@@ -1,9 +1,10 @@
 #include "aes.h"
 
-AES::AES(KeyLength key_length, uint8_t* key) : key_length_{key_length} {
+AES::AES(KeyLength key_length, uint8_t* key, uint8_t* IV) : key_length_(key_length), prev_ciphertext_(16), IV_{0} {
   switch (key_length_) {
     case AES_128:
       rounds_ = 10;
+      std::cout << "AES_128" << std::endl;
       break;
     case AES_192:
       rounds_ = 12;
@@ -12,16 +13,23 @@ AES::AES(KeyLength key_length, uint8_t* key) : key_length_{key_length} {
       rounds_ = 14;
       break;
   }
-
+  rounds_ = 10;
   if (key != nullptr) {
     set_key(key, key_length);
-    
   } else {
     expanded_key_.resize((rounds_ + 1) * 16);
     memcpy(expanded_key_.data(), key_.data(), key_length_);
     ExpandKey();
   }
+
+  if(IV != nullptr){
+    memcpy(&IV_, IV, 16);
+  }
+  else{
+    memset(&IV_, 0, 16);
+  }
 }
+
 
 size_t AES::EncryptedLength(int length) {
   return (length / 16) * 16 + (length % 16 > 0) * 16;
@@ -44,7 +52,6 @@ void AES::Encrypt(const uint8_t* texto_original, int length, uint8_t* salida) {
   }
 }
 
-
 void AES::set_key(uint8_t* key, KeyLength key_length) {
   key_length_ = key_length;
   if (key_length != key_.size()) {
@@ -63,29 +70,45 @@ inline void AES::AddRoundKey(int iteration) {
   Xor(state_.data(), state_.data(), expanded_key_.data() + iteration * 16, 16);
 }
 
-void AES::EncryptCBC(const uint8_t* plaintext, size_t length, const uint8_t* iv, uint8_t* ciphertext) {
-    std::vector<uint8_t> prev_ciphertext(16);
-    memcpy(prev_ciphertext.data(), iv, 16);
-
-    std::vector<uint8_t> plaintext_buffer(length); // Nuevo búfer para el texto en claro
-    memcpy(plaintext_buffer.data(), plaintext, length); // Copia los datos de plaintext a plaintext_buffer
-
-    for (size_t i = 0; i < length; i += 16) {
-        // Combina el bloque de texto en claro con el bloque previamente cifrado
-        for (size_t j = 0; j < 16; ++j) {
-            plaintext_buffer[i + j] ^= prev_ciphertext[j];
-        }
-
-        // Cifra el bloque modificado
-        EncryptBlock(plaintext_buffer.data() + i, ciphertext + i);
-
-        // Actualiza el bloque previamente cifrado para el siguiente bloque
-        memcpy(prev_ciphertext.data(), ciphertext + i, 16);
-    }
-    for(int k = 0; k < 16; k++){
-      std::cout << std::hex << (int)ciphertext[k];
-    }
+// Definición de la función privada UpdatePrevCiphertext
+void AES::UpdatePrevCiphertext(const uint8_t* new_ciphertext) {
+    memcpy(prev_ciphertext_.data(), new_ciphertext, key_length_);
 }
+
+void AES::EncryptCBC(const uint8_t* plaintext,const uint8_t* iv,uint8_t* ciphertext) {
+  // if (prev_ciphertext_.size() == key_length_) {
+  //  prev_ciphertext_.resize(key_length_);
+   
+  // }
+  std::vector<uint8_t> plaintext_buffer(key_length_); // Nuevo búfer para el texto en claro
+  memcpy(plaintext_buffer.data(), plaintext, key_length_); // Copia los datos de plaintext a plaintext_buffer
+
+  memcpy(prev_ciphertext_.data(), iv, key_length_);
+  // Combina el bloque de texto en claro con el bloque previamente cifrado
+  for (size_t j = 0; j < key_length_; ++j) {
+    plaintext_buffer[j] ^= prev_ciphertext_[j];
+  }
+
+  std::cout << "IV=";
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)prev_ciphertext_[k];
+  }
+  std::cout << "\n";
+  std::cout << "lo que pasa=";
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)prev_ciphertext_[k];
+  }
+  std::cout << "\n";
+
+  // Cifra el bloque modificado
+  EncryptBlock(plaintext_buffer.data(), ciphertext);
+
+  // Actualiza el bloque previamente cifrado
+  UpdatePrevCiphertext(ciphertext);
+    
+}
+
+
 
 
 void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
@@ -93,16 +116,17 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
   memcpy(state_.data(), input, 16);
   // Ronda inicio
   AddRoundKey(0);
-  // std::cout << "R" << 0 << "(subclave = ";
-  //   for(int k = 0; k < 16; k++){
-  //     std::cout << std::hex << (int)expanded_key_[0*16 + k];
-  //   }
-  //   std::cout << ") = ";
-  //   for(int k = 0; k < 16; k++){
-  //     std::cout << std::hex << (int)state_[k];
-  //   }
-  //   std::cout << "\n";
-
+  std::cout << "R" << 0 << "(subclave = ";
+    for(int k = 0; k < 16; k++){
+      std::cout << std::hex << (int)expanded_key_[0*16 + k];
+    }
+    std::cout << ") = ";
+    for(int k = 0; k < 16; k++){
+      std::cout << std::hex << (int)state_[k];
+    }
+    std::cout << "\n";
+    rounds_ =10;
+    std::cout << "ROUNDS = " << rounds_ << "\n";
     // 9 rondas
   for (int i = 1; i < rounds_; i++) {
     for (int j = 0; j < 16; j++) {
@@ -112,15 +136,15 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
     ShiftRows();
     MixColumns();
     AddRoundKey(i);
-   // std::cout << "R" << i << "(subclave = ";
-  //   for(int k = 0; k < 16; k++){
-  //     std::cout << std::hex << (int)expanded_key_[i*16 + k];
-  //   }
-  //   std::cout << ") = ";
-  //   for(int k = 0; k < 16; k++){
-  //     std::cout << std::hex << (int)state_[k];
-  //   }
-  //   std::cout << "\n";
+    // std::cout << "R" << i << "(subclave = ";
+    // for(int k = 0; k < 16; k++){
+    //   std::cout << std::hex << (int)expanded_key_[i*16 + k];
+    // }
+    // std::cout << ") = ";
+    // for(int k = 0; k < 16; k++){
+    //   std::cout << std::hex << (int)state_[k];
+    // }
+    // std::cout << "\n";
   }
 
   for (int j = 0; j < 16; j++) {
@@ -129,18 +153,17 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
 
   ShiftRows();
   AddRoundKey(rounds_);
-  // std::cout << "R10 (subclave = ";
-  // for(int k = 0; k < 16; k++){
-  //   std::cout << std::hex << (int)expanded_key_[9*16 + k];
-  // }
-  // std::cout << ") = ";
-  // for(int k = 0; k < 16; k++){
-  //   std::cout << std::hex << (int)state_[k];
-  // }
-  // std::cout << "\n";
+  std::cout << "R10 (subclave = ";
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)expanded_key_[9*16 + k];
+  }
+  std::cout << ") = ";
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)state_[k];
+  }
+  std::cout << "\n";
   memcpy(salida, state_.data(), 16);
 }
-
 
 void AES::ExpandKey() {
   for (int i = key_length_; i < (rounds_ + 1) * 16; i += key_length_) {

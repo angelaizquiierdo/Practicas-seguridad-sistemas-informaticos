@@ -39,7 +39,7 @@ std::vector<u_int8_t> stringToUint8Array(const std::string& str) {
   * Programa principal.
 */
 int main() {
-  std::string llave_string = "00112233445566778899aabbccddeeff0011223344556677";
+  std::string llave_string = "000102030405060708090A0B0C0D0E0F";
   std::string texto_string = "00112233445566778899aabbccddeeff";
   
   // Si es necesario, pedir al usuario que introduzca la llave y el texto

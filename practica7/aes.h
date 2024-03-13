@@ -16,10 +16,13 @@ class AES {
  public:
   enum KeyLength { AES_128 = 16, AES_192 = 24, AES_256 = 32 };
 
-  AES(KeyLength key_length, uint8_t* key);
+  AES(KeyLength key_length, uint8_t* key, uint8_t* IV);
 
   void set_key(uint8_t* key, KeyLength key_length);
 
+
+// Declaración de la función privada para actualizar prev_ciphertext_
+void UpdatePrevCiphertext(const uint8_t* new_ciphertext);
   /**
    * @brief Dado un conjunto de caracteres este método calcula su cifrado.
    * @param[in] input Buffer a encriptar.
@@ -36,7 +39,7 @@ class AES {
      * @param[in] iv Vector de inicialización.
      * @param[out] ciphertext Buffer donde guardar el input encriptado.
      */
-  void EncryptCBC( const uint8_t* plaintext, size_t length, const uint8_t* iv, uint8_t* ciphertext);
+  void EncryptCBC( const uint8_t* plaintext,const uint8_t* iv,uint8_t* ciphertext);
 
 
   /**
@@ -50,7 +53,8 @@ class AES {
 
  private:
   KeyLength key_length_;
-
+  std::vector<uint8_t> prev_ciphertext_;
+  uint8_t IV_ = {0};
   int rounds_;
 
   std::vector<uint8_t> key_ = {0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe,
@@ -181,4 +185,5 @@ class AES {
    */
   static void RotateMatrix(const uint8_t* input, uint8_t* output);
 };
+
 #endif

@@ -86,15 +86,13 @@ int main() {
     return 1;
   }
 
-
-
-
   uint8_t llave_aux[key_vector.size()];  
+  std::cout << "llave:";
   for (size_t i = 0; i < key_vector.size(); i++) {
     llave_aux[i] = key_vector[i];
     std::cout << std::hex << (int)llave_aux[i] << " ";
   }
-
+  std::cout << std::endl;
   uint8_t bloque1[bloque1_vector.size()];
   for (size_t i = 0; i < bloque1_vector.size(); i++) {
     bloque1[i] = bloque1_vector[i];
@@ -112,14 +110,11 @@ int main() {
   }
  
   // Crear una instancia de AES
-  AES aes(AES::AES_128, llave_aux);
+  AES aes(AES::AES_128, llave_aux, IV);
 
     
-  // Buffer para almacenar el resultado del cifrado
-  uint8_t encriptar_aes[16];
-
   uint8_t salida[16];
-  aes.EncryptCBC(bloque1, 16, IV, salida);
+  aes.EncryptCBC(bloque1, IV,salida);
   
     //int tamayo = sizeof(texto);
     // Realizar el cifrado
@@ -133,7 +128,7 @@ int main() {
   std::cout << std::endl;
 
 
-  aes.EncryptCBC(bloque2, 16, IV, salida);
+  aes.EncryptCBC(bloque2,IV,salida);
   
     //int tamayo = sizeof(texto);
     // Realizar el cifrado
@@ -146,5 +141,5 @@ int main() {
   }
   std::cout << std::endl;
 
-    return 0;
+  return 0;
 }

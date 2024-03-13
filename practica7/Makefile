@@ -13,7 +13,7 @@ SRCS = main.cc aes.cc
 # Lista de archivos objeto generados a partir de los archivos fuente
 OBJS = $(SRCS:.cc=.o)
 
-.PHONY: all clean
+
 
 # Regla por defecto: compilar el ejecutable
 all: $(TARGET)
