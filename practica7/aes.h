@@ -4,6 +4,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
+#include <cstring>
 
 #ifndef AES_H_
 #define AES_H_
@@ -20,6 +21,9 @@ class AES {
 
   void set_key(uint8_t* key, KeyLength key_length);
 
+  void set_lengith_plaintext(size_t length) {
+    length_plaintext_ = length;
+  }
 
 // Declaración de la función privada para actualizar prev_ciphertext_
 void UpdatePrevCiphertext(const uint8_t* new_ciphertext);
@@ -56,7 +60,7 @@ void UpdatePrevCiphertext(const uint8_t* new_ciphertext);
   std::vector<uint8_t> prev_ciphertext_;
   uint8_t IV_ = {0};
   int rounds_;
-
+  size_t length_plaintext_ =16;
   std::vector<uint8_t> key_ = {0x60, 0x3d, 0xeb, 0x10, 0x15, 0xca, 0x71, 0xbe,
                                0x2b, 0x73, 0xae, 0xf0, 0x85, 0x7d, 0x77, 0x81,
                                0x1f, 0x35, 0x2c, 0x07, 0x3b, 0x61, 0x08, 0xd7,

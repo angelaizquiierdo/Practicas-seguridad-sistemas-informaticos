@@ -72,19 +72,21 @@ inline void AES::AddRoundKey(int iteration) {
 
 // Definición de la función privada UpdatePrevCiphertext
 void AES::UpdatePrevCiphertext(const uint8_t* new_ciphertext) {
-    memcpy(prev_ciphertext_.data(), new_ciphertext, key_length_);
+  memcpy(prev_ciphertext_.data(), new_ciphertext, key_length_);
 }
 
-void EncryptCBC(const uint8_t* plaintext, const uint8_t* iv, uint8_t* ciphertext) {
+void AES::EncryptCBC(const uint8_t* plaintext, const uint8_t* iv, uint8_t* ciphertext) {
   size_t pos = 0;
-  memcpy(prev_ciphertext_.data(), iv, key_length_);
-    // Llama a EncryptCBCBlock tamaño de plaintext veces
-  while (pos + 16 <= key_length_) {
+  UpdatePrevCiphertext(iv);
+  
+  // Llama a EncryptCBCBlock el número de veces necesario
+  while (pos + 16 <= length_plaintext_) {
     EncryptCBCBlock(plaintext + pos, ciphertext + pos);
     pos += 16;
+    std::cout << "\t Posicion " << pos << std::endl;
   }
-  
 }
+
 
 
 void AES::EncryptCBCBlock(const uint8_t* plaintext,uint8_t* ciphertext) {
@@ -95,6 +97,10 @@ void AES::EncryptCBCBlock(const uint8_t* plaintext,uint8_t* ciphertext) {
   std::vector<uint8_t> plaintext_buffer(key_length_); // Nuevo búfer para el texto en claro
   memcpy(plaintext_buffer.data(), plaintext, key_length_); // Copia los datos de plaintext a plaintext_buffer
 
+  std::cout << "plaintext=";
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)plaintext_buffer[k];
+  }
 
   // Combina el bloque de texto en claro con el bloque previamente cifrado
   for (size_t j = 0; j < key_length_; ++j) {
@@ -108,7 +114,7 @@ void AES::EncryptCBCBlock(const uint8_t* plaintext,uint8_t* ciphertext) {
   std::cout << "\n";
   std::cout << "lo que pasa=";
   for(int k = 0; k < 16; k++){
-    std::cout << std::hex << (int)prev_ciphertext_[k];
+    std::cout << std::hex << (int)plaintext_buffer[k];
   }
   std::cout << "\n";
 
@@ -137,7 +143,7 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
       std::cout << std::hex << (int)state_[k];
     }
     std::cout << "\n";
-    rounds_ =10;
+    rounds_ = 10;
     std::cout << "ROUNDS = " << rounds_ << "\n";
     // 9 rondas
   for (int i = 1; i < rounds_; i++) {
@@ -157,6 +163,7 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
     //   std::cout << std::hex << (int)state_[k];
     // }
     // std::cout << "\n";
+    std::cout << "R" << i << "(subclave = ";
   }
 
   for (int j = 0; j < 16; j++) {

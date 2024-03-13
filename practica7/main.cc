@@ -50,8 +50,8 @@ std::vector<uint8_t> stringToUint8Array(const std::string& str) {
 */
 int main() {
   std::string clave_string =  "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F";
-  std::string Bloque1_texto = "00 11 22 33 44 55 66 77 88 99 aa bb cc dd ee ff";
-  std::string Bloque2_texto = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
+  
+  std::string Bloque2_texto = "00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
   std::string IV_string = "00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00";
   // Si es necesario, pedir al usuario que introduzca la llave y el texto
 
@@ -67,7 +67,7 @@ int main() {
   
   // Convertir la llave y el texto a un vector de uint8_t
   std::vector<uint8_t> key_vector = stringToUint8Array(clave_string);
-  std::vector<uint8_t> bloque1_vector = stringToUint8Array(Bloque1_texto);
+
   std::vector<uint8_t> bloque2_vector = stringToUint8Array(Bloque2_texto);
   std::vector<uint8_t> IV_vector = stringToUint8Array(IV_string);
 
@@ -76,15 +76,7 @@ int main() {
     return 1;
   }
 
-  if (bloque1_vector.size() != 16) {
-    std::cout << "La longitud del bloque 1 debe ser de 32 caracteres" << bloque1_vector.size() <<std::endl;
-    return 1;
-  }
-
-  if (bloque2_vector.size() != 16) {
-    std::cout << "La longitud del bloque 2 debe ser de 32 caracteres" <<  bloque2_vector.size() << std::endl;
-    return 1;
-  }
+  std::cout << "tamaño de texto:" << bloque2_vector.size() << std::endl;
 
   uint8_t llave_aux[key_vector.size()];  
   std::cout << "llave:";
@@ -93,17 +85,12 @@ int main() {
     std::cout << std::hex << (int)llave_aux[i] << " ";
   }
   std::cout << std::endl;
-  uint8_t bloque1[bloque1_vector.size()];
-  for (size_t i = 0; i < bloque1_vector.size(); i++) {
-    bloque1[i] = bloque1_vector[i];
-  }
 
   uint8_t bloque2[bloque2_vector.size()];
   for (size_t i = 0; i < bloque2_vector.size(); i++) {
     bloque2[i] = bloque2_vector[i];
   }
 
-  
   uint8_t IV[IV_vector.size()];
   for (size_t i = 0; i < IV_vector.size(); i++) {
     IV[i] = IV_vector[i];
@@ -112,34 +99,22 @@ int main() {
   // Crear una instancia de AES
   AES aes(AES::AES_128, llave_aux, IV);
 
-    
-  uint8_t salida[16];
-  aes.EncryptCBC(bloque1, IV,salida);
+  aes.set_lengith_plaintext(bloque2_vector.size());
+  uint8_t salida[bloque2_vector.size()];
+  aes.EncryptCBC(bloque2, IV,salida);
   
     //int tamayo = sizeof(texto);
     // Realizar el cifrado
     //aes.Encrypt(texto, tamayo , encriptar_aes);
 
     // Mostrar el resultado del cifrado
-  std::cout << "Bloque 1: ";
+  std::cout << "Bloque 1: " << sizeof(salida) << std::endl;
   for (size_t i = 0; i < sizeof(salida); ++i) {
     std::cout << std::hex << (int)salida[i];
   }
   std::cout << std::endl;
 
 
-  aes.EncryptCBC(bloque2,IV,salida);
-  
-    //int tamayo = sizeof(texto);
-    // Realizar el cifrado
-    //aes.Encrypt(texto, tamayo , encriptar_aes);
-
-    // Mostrar el resultado del cifrado
-  std::cout << "Bloque 2: ";
-  for (size_t i = 0; i < sizeof(salida); ++i) {
-    std::cout << std::hex << (int)salida[i];
-  }
-  std::cout << std::endl;
 
   return 0;
 }
