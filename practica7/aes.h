@@ -31,7 +31,7 @@ void UpdatePrevCiphertext(const uint8_t* new_ciphertext);
    */
   void Encrypt(const uint8_t* input, int length, uint8_t* output);
 
-
+  void EncryptCBC(const uint8_t* plaintext, const uint8_t* iv, uint8_t* ciphertext);
     /**
      * @brief Dado un conjunto de caracteres este método calcula su cifrado.
      * @param[in] plaintext Buffer a encriptar.
@@ -39,7 +39,7 @@ void UpdatePrevCiphertext(const uint8_t* new_ciphertext);
      * @param[in] iv Vector de inicialización.
      * @param[out] ciphertext Buffer donde guardar el input encriptado.
      */
-  void EncryptCBC( const uint8_t* plaintext,const uint8_t* iv,uint8_t* ciphertext);
+  void EncryptCBCBlock( const uint8_t* plaintext, uint8_t* ciphertext);
 
 
   /**

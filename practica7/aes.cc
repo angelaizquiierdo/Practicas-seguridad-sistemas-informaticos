@@ -75,7 +75,19 @@ void AES::UpdatePrevCiphertext(const uint8_t* new_ciphertext) {
     memcpy(prev_ciphertext_.data(), new_ciphertext, key_length_);
 }
 
-void AES::EncryptCBC(const uint8_t* plaintext,const uint8_t* iv,uint8_t* ciphertext) {
+void EncryptCBC(const uint8_t* plaintext, const uint8_t* iv, uint8_t* ciphertext) {
+  size_t pos = 0;
+  memcpy(prev_ciphertext_.data(), iv, key_length_);
+    // Llama a EncryptCBCBlock tamaño de plaintext veces
+  while (pos + 16 <= key_length_) {
+    EncryptCBCBlock(plaintext + pos, ciphertext + pos);
+    pos += 16;
+  }
+  
+}
+
+
+void AES::EncryptCBCBlock(const uint8_t* plaintext,uint8_t* ciphertext) {
   // if (prev_ciphertext_.size() == key_length_) {
   //  prev_ciphertext_.resize(key_length_);
    
@@ -83,7 +95,7 @@ void AES::EncryptCBC(const uint8_t* plaintext,const uint8_t* iv,uint8_t* ciphert
   std::vector<uint8_t> plaintext_buffer(key_length_); // Nuevo búfer para el texto en claro
   memcpy(plaintext_buffer.data(), plaintext, key_length_); // Copia los datos de plaintext a plaintext_buffer
 
-  memcpy(prev_ciphertext_.data(), iv, key_length_);
+
   // Combina el bloque de texto en claro con el bloque previamente cifrado
   for (size_t j = 0; j < key_length_; ++j) {
     plaintext_buffer[j] ^= prev_ciphertext_[j];
