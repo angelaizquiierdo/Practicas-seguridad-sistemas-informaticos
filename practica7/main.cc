@@ -108,7 +108,7 @@ int main() {
     //aes.Encrypt(texto, tamayo , encriptar_aes);
 
     // Mostrar el resultado del cifrado
-  std::cout << "Bloque 1: " << sizeof(salida) << std::endl;
+  
   for (size_t i = 0; i < sizeof(salida); ++i) {
     std::cout << std::hex << (int)salida[i];
   }

@@ -90,33 +90,18 @@ void AES::EncryptCBC(const uint8_t* plaintext, const uint8_t* iv, uint8_t* ciphe
 
 
 void AES::EncryptCBCBlock(const uint8_t* plaintext,uint8_t* ciphertext) {
-  // if (prev_ciphertext_.size() == key_length_) {
-  //  prev_ciphertext_.resize(key_length_);
-   
-  // }
+
   std::vector<uint8_t> plaintext_buffer(key_length_); // Nuevo búfer para el texto en claro
   memcpy(plaintext_buffer.data(), plaintext, key_length_); // Copia los datos de plaintext a plaintext_buffer
 
-  std::cout << "plaintext=";
-  for(int k = 0; k < 16; k++){
-    std::cout << std::hex << (int)plaintext_buffer[k];
-  }
+  
 
   // Combina el bloque de texto en claro con el bloque previamente cifrado
   for (size_t j = 0; j < key_length_; ++j) {
     plaintext_buffer[j] ^= prev_ciphertext_[j];
   }
 
-  std::cout << "IV=";
-  for(int k = 0; k < 16; k++){
-    std::cout << std::hex << (int)prev_ciphertext_[k];
-  }
-  std::cout << "\n";
-  std::cout << "lo que pasa=";
-  for(int k = 0; k < 16; k++){
-    std::cout << std::hex << (int)plaintext_buffer[k];
-  }
-  std::cout << "\n";
+  
 
   // Cifra el bloque modificado
   EncryptBlock(plaintext_buffer.data(), ciphertext);
@@ -134,17 +119,7 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
   memcpy(state_.data(), input, 16);
   // Ronda inicio
   AddRoundKey(0);
-  std::cout << "R" << 0 << "(subclave = ";
-    for(int k = 0; k < 16; k++){
-      std::cout << std::hex << (int)expanded_key_[0*16 + k];
-    }
-    std::cout << ") = ";
-    for(int k = 0; k < 16; k++){
-      std::cout << std::hex << (int)state_[k];
-    }
-    std::cout << "\n";
-    rounds_ = 10;
-    std::cout << "ROUNDS = " << rounds_ << "\n";
+  
     // 9 rondas
   for (int i = 1; i < rounds_; i++) {
     for (int j = 0; j < 16; j++) {
@@ -154,15 +129,7 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
     ShiftRows();
     MixColumns();
     AddRoundKey(i);
-    // std::cout << "R" << i << "(subclave = ";
-    // for(int k = 0; k < 16; k++){
-    //   std::cout << std::hex << (int)expanded_key_[i*16 + k];
-    // }
-    // std::cout << ") = ";
-    // for(int k = 0; k < 16; k++){
-    //   std::cout << std::hex << (int)state_[k];
-    // }
-    // std::cout << "\n";
+    
     std::cout << "R" << i << "(subclave = ";
   }
 
