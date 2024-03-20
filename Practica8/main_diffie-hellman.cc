@@ -48,7 +48,7 @@ long long mod_exp(long long base_alpha, long long Y_exponente, long long modulo_
 
 
 void Diffie_hellman(long long p, long long alpha, long long xA, long long xB) {
-      // Paso 1: Calcula yA = α^xA mod p y muestra el valor
+  // Paso 1: Calcula yA = α^xA mod p y muestra el valor
   long long yA = mod_exp(alpha, xA, p);
   std::cout << "yA = α^xA mod p = " << yA << std::endl;
 
