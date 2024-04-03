@@ -5,7 +5,7 @@
 
 #include "rsa.h"
 
-int calcularTamanoBloque(unsigned long n, int base) {
+int calcularTamanoBloque(unsigned long n, int base=26) {
     // Calcular la parte entera de log_b(n)
     int tamanoBloque = static_cast<int>(log(n) / log(base));
     return tamanoBloque;
@@ -28,26 +28,31 @@ int main() {
     std::cin >> q;
     std::cout << "Ingrese el valor de d: ";
     std::cin >> d;
-
-    // Crear objeto RSA con los parámetros ingresados, y se comprueba en el constructor si son primos p,q y si d es primo con fi
-    RSA rsa(p, q,d);
-    int base = 26; // Ejemplo de base (alfabeto sin la letra Ñ)
-    unsigned long j = calcularTamanoBloque(rsa.getn(), base);
+    try {
+        RSA rsa(p, q, d);
+        unsigned long j = calcularTamanoBloque(rsa.getn());
      
-    std::cout << "Tamaño del bloque: " << j << std::endl;
-    std::vector<unsigned long> bloques_codificados = rsa.codificarTexto(mensaje, j);
-    std::cout << "Bloques codificados:" << std::endl;
-    for (unsigned long bloque : bloques_codificados) {
-        std::cout << bloque << " ";
-    }
-    std::cout << std::endl;
-    std::vector<unsigned long> texto_cifrado = rsa.cifrarTexto(bloques_codificados);
+        std::cout << "Tamaño del bloque: " << j << std::endl;
+        std::vector<unsigned long> bloques_codificados = rsa.codificarTexto(mensaje, j);
+        std::cout << "Bloques codificados:" << std::endl;
+        for (unsigned long bloque : bloques_codificados) {
+            std::cout << bloque << " ";
+        }
+        std::cout << std::endl;
+        std::vector<unsigned long> texto_cifrado = rsa.cifrarTexto(bloques_codificados);
 
-    std::cout << "Texto cifrado:" << std::endl;
-    for (unsigned long bloque : texto_cifrado) {
-        std::cout << bloque << " ";
+        std::cout << "Texto cifrado:" << std::endl;
+        for (unsigned long bloque : texto_cifrado) {
+            std::cout << bloque << " ";
+        }
+        std::cout << std::endl;
+    } catch (std::invalid_argument& e) {
+        std::cerr << e.what() << std::endl;
+        return 1;
     }
-    std::cout << std::endl;
+
+    //int base = 26; // Ejemplo de base (alfabeto sin la letra Ñ)
+    
 
 
     return 0;

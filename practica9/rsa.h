@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <cmath>
+#include <stdexcept>
 
 #include <cctype> // Para la función std::toupper
 #include <algorithm>
@@ -19,7 +20,6 @@ class RSA {
     unsigned long gete() {return e_;};
     
     bool LehmanPeralta(unsigned long n);
-    bool VerificaPrimo(long long valor, int rodadas);
     bool EuclidesExtendido(unsigned long a, unsigned long b);
     
     void CalcularEinverso(unsigned long a, unsigned long b);

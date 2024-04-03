@@ -17,11 +17,11 @@ RSA::RSA(unsigned long p, unsigned long q, unsigned long d) : p_(0), q_(0), d_(0
       CalcularEinverso(d_, fi_);
       std::cout << "Clave Publica generada (n, e) "<<  n_ << "," << e_ << std::endl;
     } else { 
-      std::cout << "Error: d no es primo con φ(n)." << std::endl;
+      throw std::invalid_argument("Error: d no es primo con φ(n).");
     }
 
   } else {
-    std::cout << "Error: p y/o q no son primos." << std::endl;
+    throw std::invalid_argument("Error: p y/o q no son primos.");
   }
 }
 
@@ -88,13 +88,13 @@ bool RSA::LehmanPeralta(unsigned long n) {
     // Comprobar que n no es divisible por ningún primo pequeño (2, 3, 5, 7, 11)
     std::vector<unsigned long> primos_pequenos = {2, 3, 5, 7, 11};
     for (unsigned long primo : primos_pequenos) {
-        if (n % primo == 0){
-            if (n != primo) {
-                return false; // n no es primo
-            } else {
-                return true; // n es primo
-            }
-        };
+      if (n % primo == 0){
+        if (n != primo) {
+          return false; // n no es primo
+        } else {
+          return true; // n es primo
+        }
+      }
     }
 
     // Elegir enteros aleatorios a, entre 2 y n-1
@@ -105,27 +105,30 @@ bool RSA::LehmanPeralta(unsigned long n) {
     unsigned long exp = (n - 1) / 2;
     unsigned long  result = 1;
     for (unsigned long i = 0; i < exp; ++i) {
-        result = (result * a) % n;
+      
+      result = (result * a) % n;
+      //std::cout << "a^((n-1)/2) mod n: " << result << std::endl;
     }
 
     // Verificar si n es compuesto
     if (result == 1 || result == n - 1) {
-        return true; // n tal vez es primo
+      return true; // n tal vez es primo
     }
     for (unsigned long i = 1; i < exp; ++i) {
-        result = (result * result) % n;
-        if (result == n - 1) return true; // n tal vez es primo
+      result = (result * result) % n;
+      if (result == n - 1) return true; // n tal vez es primo
     }
     return false; // n es compuesto
 }
 
 /**
- * Calcula el inverso multiplicativo de a módulo b, para hallar la clave pública e.
+ * Esta función calcula el inverso multiplicativo de un número d_ módulo φ(n)φ(n), 
+ * que se utiliza para hallar la clave pública ee
 */
 void RSA::CalcularEinverso(unsigned long modulo, unsigned long numero) {
   long long x_previo = 1, x_actual = 0, y_previo = 0, y_actual = 1;
   unsigned long dividendo_previo = modulo, dividendo_actual = numero;
-    
+  //encotrar el max comun divisor (MCD) 
   while (dividendo_actual != 0) {
     unsigned long cociente = dividendo_previo / dividendo_actual;
     long long temp_x = x_actual, temp_y = y_actual;
@@ -137,7 +140,9 @@ void RSA::CalcularEinverso(unsigned long modulo, unsigned long numero) {
     dividendo_actual = dividendo_previo - cociente * dividendo_actual;
     dividendo_previo = temp_dividendo;
   }
-    
+  
+  // Si el coeficiente x resulta ser negativo después de los cálculos, 
+  // se suma el valor de φ(n)φ(n) (fi_) para hacerlo positivo. 
   if (x_previo < 0) {
     x_previo += fi_;
   }
@@ -194,8 +199,6 @@ bool RSA::EuclidesExtendido(unsigned long a, unsigned long b) {
         i++;
     }
   
-    // Imprimir el máximo común divisor
-    std::cout << "Máximo común divisor (MCD): " << residuos[i] << std::endl;
 
     if (residuos[i] == 1) {
         // Si el inverso es negativo, sumar fi_
@@ -209,24 +212,7 @@ bool RSA::EuclidesExtendido(unsigned long a, unsigned long b) {
     return false;
 }
 
-bool RSA::VerificaPrimo(long long valor, int rodadas){//Função para verificar número Primo
-	long long number;
-	number = valor;
-	if (valor<=3){
-		 return true;
-	}
-	if((valor%2)==0){
-	  return false;
-	}
 
-  for (int i=0; i<rodadas; i++) {
-    if (!LehmanPeralta(number)) {
-      std::cout << "No es primo :" << number << std::endl;
-      return false;
-    }
-  }
-  return true;
-}
 
 
 /**

@@ -2,7 +2,7 @@
 CC = g++
 
 # Opciones de compilación
-CFLAGS = -std=c++20 -Wall
+CFLAGS = -std=c++2a -Wall
 
 # Nombre del ejecutable
 TARGET = implementacioncifradoRSA
