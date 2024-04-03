@@ -10,3 +10,14 @@ Else, Si existe i tal que a;(P-1)/2/-1
 (mod p), entonces p es compuesto
 Else entonces p tal vez es
 primo
+
+
+Para cifrar un mensaje y que se pueda descifrar
+unívocamente, se deben usar enteros menores que n.
+Así, si el mensaje original está en base b, hay que dividirlo en
+bloques que al pasarlos a base decimal no superen n, es decir
+bloques de tamaño j-1=parte Entera de (log, n) pues así
+bi-1<n<bi,
+Si el resultado entero de la operación de cifrado se quiere
+codificar en base b para transmitirlo, deben usarse j símbolos
+pues para descifrar hay que dividir en bloques de tamaño j.
