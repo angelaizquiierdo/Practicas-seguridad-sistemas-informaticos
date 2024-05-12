@@ -60,7 +60,12 @@ void AES::set_key(uint8_t* key, KeyLength key_length) {
 }
 
 inline void AES::AddRoundKey(int iteration) {
+  std::cout << "AddRoundKey:\n";
   Xor(state_.data(), state_.data(), expanded_key_.data() + iteration * 16, 16);
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)state_[k];
+  }
+  std::cout << "\n";
 }
 
 void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
@@ -83,7 +88,11 @@ void AES::EncryptBlock(const uint8_t input[16], uint8_t salida[16]) {
     for (int j = 0; j < 16; j++) {
       state_[j] = GetSubByte(state_[j]);
     }
-
+    std::cout << "SubBytes:\n";
+    for(int k = 0; k < 16; k++){
+      std::cout << std::hex << (int)state_[k];
+    } 
+    std::cout << "\n";
     ShiftRows();
     MixColumns();
     AddRoundKey(i);
@@ -147,22 +156,58 @@ void AES::ExpandKey() {
 
 
 inline void AES::MixColumns() {
+  std::cout << "MixColumns:\n";
   MixColumn(state_.data());
+   for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)state_[k];
+  }
+  std::cout << "\n";
   MixColumn(state_.data() + 4);
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)state_[k];
+  }
+  std::cout << "\n";
   MixColumn(state_.data() + 8);
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)state_[k];
+  }
+  std::cout << "\n";
   MixColumn(state_.data() + 12);
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)state_[k];
+  }
+  std::cout << "\n";
 }
 
 
 void AES::ShiftRows() {
+  std::cout << "ShiftRows:\n";
   std::array<uint8_t, 16> temp;
   RotateMatrix(state_.data(), temp.data());
-
+  std::cout << "\t1. RotateMatrix:\n";
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)temp[k];
+  }
+  std::cout << "\n\t2. ShiftRow:\n";
   ShiftRow(temp.data() + 4, 1);
+    for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)temp[k];
+  }
+  std::cout << "\n\t3. ShiftRow:\n";
   ShiftRow(temp.data() + 8, 2);
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)temp[k];
+  }
+  std::cout << "\n\t4. ShiftRow:\n";
   ShiftRow(temp.data() + 12, 3);
-
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)temp[k];
+  }
   RotateMatrix(temp.data(), state_.data());
+  std::cout << "\n\t5. RotateMatrix:\n";
+  for(int k = 0; k < 16; k++){
+    std::cout << std::hex << (int)state_[k];
+  }
 }
 
 void AES::Xor(uint8_t* a, const uint8_t* b, const uint8_t* c, int size) const {

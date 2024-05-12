@@ -26,13 +26,13 @@ std::vector<int> GeneradorCA_GPS( std::vector<int>& lfsr1,  std::vector<int>& lf
     int xor2 = lfsr2[1] ^ lfsr2[2] ^ lfsr2[5] ^ lfsr2[7] ^ lfsr2[8] ^ lfsr2[9];
     //std::cout << "xr2: " << xor2 << std::endl;
    
-    // if( iterar >= 9) {
-       //ImprimirVector("1. Sin ultimo elemento", lfsr1);
-    // }
-    //  //
-    //  if( iterar >= 9)  {
-       //ImprimirVector("2. Sin ultimo elemento", lfsr2);
-    //  }
+    if( iterar >= 9) {
+       ImprimirVector("1. Sin ultimo elemento", lfsr1);
+    }
+     
+     if( iterar >= 9)  {
+       ImprimirVector("2. Sin ultimo elemento", lfsr2);
+     }
     const int ultimo_elemento_lfsr = lfsr1[9];
     switch (id_satelite)
     {
@@ -161,13 +161,14 @@ void LimpiarPantalla() {
 }
 
 int main() {
-  std::vector<int> lfsr1(10,1);
-  std::vector<int> lfsr2(10,1);
+
   int id_satelite;
   int logitud_secuencia;
   char respuesta;
   
   do{
+    std::vector<int> lfsr1(10,1); // rellenar con 1111111111
+    std::vector<int> lfsr2(10,1); // rellenar con 1111111111
     LimpiarPantalla();
     std::cout << " ______________________________________________________________________________" << std::endl << std::endl;
     std::cout << "                  IMPREMENTAR EL GENERADOR C/A USANDO EN GPS                   " << std::endl;

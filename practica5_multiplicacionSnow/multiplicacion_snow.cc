@@ -21,7 +21,6 @@ std::vector<std::bitset<8>> descomponerNumero(std::bitset<8> numero) {
 }
 
 
-
 // Función para realizar la multiplicación de polinomios en módulo con retroalimentación LFSR
 std::bitset<8> Producto(std::bitset<8> num, std::bitset<8> num2, std::bitset<8> polinomio) {
   std::bitset<8> suma, auxsuma;
